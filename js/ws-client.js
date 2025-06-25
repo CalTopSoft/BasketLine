@@ -1,6 +1,6 @@
 const wsUrl = window.location.hostname === 'localhost'
   ? 'ws://localhost:8080'
-  : 'wss://basquetonline-new.onrender.com'; // Cambia esto al dominio de Render que crearás
+  : 'wss://basquetonline-servidor.onrender.com'; // Cambia esto al dominio de Render que crearás
 
 let ws = null;
 let messageCallback = null;
