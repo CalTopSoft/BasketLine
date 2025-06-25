@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
+    <title>BasketLine Multijugador - Modo Online</title>
+    <meta property="og:title" content="BasketLine Multijugador">
+    <meta property="og:image" content="https://caltopsoft.github.io/BasquetOnline/img/iconoweb/favicon.png">
+    
+    <!-- React y ReactDOM desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+
+    <!-- Babel para interpretar JSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+    <!-- Librería de p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="public/styles/inicio.css" />
+    <link rel="stylesheet" href="public/styles/credits.css" />
+    <link rel="stylesheet" href="public/styles/rankings.css" />
+    <link rel="stylesheet" href="public/styles/rooms.css" />
+    <link rel="stylesheet" href="public/styles/icon-selection.css" />
+    <link rel="stylesheet" href="public/styles/result.css" />
+    <link rel="stylesheet" href="public/styles/preloader.css" />
+    <link rel="icon" href="img/iconoweb/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    
+    <!-- Pantalla de carga -->
+    <div id="loader">
+      <div class="loader-background"></div>
+      <div class="loader-content">
+        <h1 class="loader-title">BasketLine Multijugador</h1>
+        <div class="loader-ball"></div>
+        <div class="progress-container">
+          <div class="progress-bar"></div>
+        </div>
+        <div class="progress-text">Cargando datos... 0%</div>
+      </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div id="root"></div>
+
+    <!-- Componentes -->
+    <script src="js/ws-client.js"></script>
+    <script type="text/babel" src="js/SoundManager.js"></script>
+    <script type="text/babel" src="js/Home.js"></script>
+    <script type="text/babel" src="js/Rooms.js"></script>
+    <script type="text/babel" src="js/IconSelection.js"></script>
+    <script type="text/babel" src="js/Gameplay.js"></script>
+    <script type="text/babel" src="js/Rankings.js"></script>
+    <script type="text/babel" src="js/Credits.js"></script>
+    <script type="text/babel" src="js/Result.js"></script>
+    <script type="text/babel" src="js/Chat.js"></script>
+
+    <!-- Precargador -->
+    <script type="text/babel" src="js/Preloader.js"></script>
+
+    <!-- App principal -->
+    <script type="text/babel" src="js/App.js"></script>
+
+    <!-- Configuración -->
+    <script src="js/config.js"></script>
+
+    <!-- Iniciar precargador -->
+    <script type="text/babel">
+      Preloader();
+    </script>
+  </body>
+</html>

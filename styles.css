@@ -1,0 +1,941 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+#root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+}
+.gameplay {
+    width: 750px;
+    height: 550px;
+    position: relative;
+    overflow: hidden;
+    background: url('img/fondo/background.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: margin-right 0.3s ease; /* Transición suave para centrar */
+}
+.gameplay.chat-closed {
+    margin-right: 0; /* Centrar cuando el chat está cerrado */
+}
+.gameplay.chat-open {
+    margin-right: 320px; /* Desplazar a la izquierda cuando el chat está abierto */
+}
+.game-container {
+    position: relative;
+    width: 600px;
+    height: 400px;
+}
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+}
+button:hover {
+    background-color: #45a049;
+}
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+input {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.score-container {
+    position: absolute;
+    top: 370px;
+    left: -30px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    pointer-events: none;
+    z-index: 100;
+    filter: drop-shadow(0 0 8px rgba(255, 50, 50, 0.7));
+}
+
+.score-player {
+    font-family: 'Bangers', cursive;
+    font-size: 38px;
+    font-weight: bold;
+    padding: 8px 20px;
+    color: #fff;
+    background: linear-gradient(145deg, #ff0000, #cc0000);
+    border: 5px solid #000;
+    border-radius: 15px;
+    text-shadow:
+        -3px -3px 0 #000,
+        3px -3px 0 #000,
+        -3px 3px 0 #000,
+        3px 3px 0 #000,
+        0 0 10px rgba(255, 215, 0, 0.7);
+    box-shadow: 
+        0 6px 0 #000,
+        0 0 20px rgba(255, 0, 0, 0.5);
+    animation: 
+        scorePulse 1.5s infinite ease-in-out,
+        animeGlow 2s infinite alternate;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.score-player::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border: 2px dashed rgba(255, 255, 0, 0.6);
+    border-radius: 18px;
+    animation: rotateBorder 4s linear infinite;
+    z-index: -1;
+}
+
+.score-player::after {
+    content: '✦✦';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffcc00;
+    font-size: 24px;
+    animation: sparkle 1.5s infinite;
+}
+
+@keyframes scorePulse {
+    0%, 100% { transform: scale(1) rotateZ(0deg); }
+    50% { transform: scale(1.15) rotateZ(2deg); }
+}
+
+@keyframes animeGlow {
+    0% { box-shadow: 0 6px 0 #000, 0 0 20px rgba(255, 0, 0, 0.5); }
+    100% { box-shadow: 0 6px 0 #000, 0 0 30px rgba(255, 50, 50, 0.8); }
+}
+
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); opacity: 0.8; }
+    100% { transform: rotate(360deg); opacity: 0.2; }
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+.turn {
+    position: absolute;
+    bottom: -65px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    padding: 10px 20px;
+    background: linear-gradient(145deg, #ff3e6d, #ff7b3e);
+    border-radius: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 
+        0 4px 15px rgba(255, 62, 109, 0.6),
+        0 0 0 2px #fff,
+        0 0 0 4px #ff3e6d;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    font-family: 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    border: none;
+    overflow: hidden;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.turn::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(45deg, 
+        rgba(255,255,255,0.1) 0%, 
+        rgba(255,255,255,0.3) 50%, 
+        rgba(255,255,255,0.1) 100%);
+    transform: rotate(45deg) translate(-20px, -20px);
+    animation: shine 3s infinite;
+    z-index: -1;
+}
+
+.turn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 
+        0 6px 20px rgba(255, 62, 109, 0.8),
+        0 0 0 2px #fff,
+        0 0 0 4px #ff3e6d;
+    background: linear-gradient(145deg, #ff2d63, #ff6b2d);
+}
+
+@keyframes shine {
+    0% { transform: rotate(45deg) translate(-30px, -30px); }
+    100% { transform: rotate(45deg) translate(30px, 30px); }
+}
+
+.turn::after {
+    content: '🤾‍♂️';
+    margin-left: 8px;
+    display: inline-block;
+    animation: pulse 0.8s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.3); opacity: 1; }
+}
+
+.round {
+    position: absolute;
+    top: -65px;
+    left: -65px;
+    font-family: 'Bangers', cursive;
+    font-size: 23px;
+    font-weight: 700;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 4px solid #000;
+    letter-spacing: 2px;
+    user-select: none;
+    z-index: 1000;
+    cursor: default;
+    background-color: #1f4d91;
+    text-shadow: 2px 2px 0 #000;
+    transform: skewX(-5deg);
+    overflow: hidden;
+}
+
+.round::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+    );
+    transform: skewX(-5deg);
+    animation: shineMove 3s linear infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes shineMove {
+    0% { left: -50%; }
+    100% { left: 150%; }
+}
+
+.timer {
+    position: absolute;
+    width: 120px;
+    height: 10px;
+    background: #222;
+    border-radius: 5px;
+    border: 1px solid #444;
+    box-shadow: 
+        inset 0 0 3px rgba(0, 0, 0, 0.8),
+        0 0 5px rgba(255, 0, 0, 0.5);
+    overflow: hidden;
+    display: none;
+}
+
+.timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, 
+        #ff0000 0%, 
+        #ff5500 30%, 
+        #00ff00 70%);
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 0, 0.3);
+    animation: 
+        gradient-flow 3s infinite linear,
+        pulse-glow 1.5s infinite alternate;
+    transition: width 0.3s linear;
+}
+
+.timer-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.1) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    animation: scan 0.5s infinite linear;
+}
+
+.timer.active {
+    display: block;
+    animation: slight-shake 0.2s infinite linear;
+}
+
+.timer.critical .timer-bar {
+    background: linear-gradient(90deg, 
+        #ff0000 0%, 
+        #ff0000 100%);
+    animation: 
+        critical-pulse 0.5s infinite alternate;
+}
+
+@keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-glow {
+    0% { opacity: 0.9; box-shadow: 0 0 5px rgba(0, 255, 0, 0.3); }
+    100% { opacity: 1; box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); }
+}
+
+@keyframes scan {
+    0% { background-position: 0 0; }
+    100% { background-position: 4px 0; }
+}
+
+@keyframes slight-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-0.5px); }
+    75% { transform: translateX(0.5px); }
+}
+
+@keyframes critical-pulse {
+    0% { opacity: 0.7; box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
+    100% { opacity: 1; box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+}
+
+.timer.player1-timer {
+    top: 12px;
+    right: 515px;
+}
+
+.timer.player2-timer {
+    top: 12px;
+    right: -40px;
+}
+
+.countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+.player-icon {
+    position: absolute;
+    top: -70px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid #000000;
+    background-color: #3a3d3d;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: bounceIcon 1.5s ease-in-out infinite;
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7));
+}
+
+.player-icon img {
+    width: 110%;
+    height: 110%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+.player-icon:hover img {
+    transform: scale(1.1);
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.5), 
+        0 0 20px rgb(0, 0, 0);
+    filter: drop-shadow(0 0 10px rgba(32, 217, 15, 0.9));
+}
+
+@keyframes bounceIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.player1 { left: calc(50% - 157px); }
+.player2 { left: calc(50% + 100px); }
+
+.player-name {
+    position: absolute;
+    top: -6px;
+    font-family: 'Bangers', cursive;
+    font-size: 20px;
+    color: #fff200;
+    text-align: center;
+    background: #ff3c3c;
+    padding: 4px 7px;
+    border: 3px solid #000;
+    border-radius: 10px;
+    text-shadow: 
+        -2px -2px 0 #000, 
+        2px -2px 0 #000, 
+        -2px 2px 0 #000, 
+        2px 2px 0 #000;
+    transform: skewX(-5deg);
+    box-shadow: 0 4px 0 #000;
+    animation: bounceName 1.5s ease-in-out infinite;
+    z-index: 100;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes bounceName {
+    0%, 100% { transform: translateY(0) skewX(-5deg); }
+    50% { transform: translateY(-5px) skewX(-5deg); }
+}
+
+.player1-name { left: calc(50% - 186px); }
+.player2-name { left: calc(50% + 70px); }
+.turn-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    color: yellow;
+    text-shadow: 1px 1px 2px black;
+}
+.room {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.height-limit {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    border-top: 2px dashed rgba(255, 255, 0, 0.6);
+}
+.waiting-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+
+/* CHAT - ESTILO BASE PARA PC */
+.chat-container {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 300px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    font-family: 'Bangers', cursive;
+    color: #fff;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #1a1a2e, #2e2e4a);
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 10px rgba(0, 255, 255, 0.2);
+    border: 2px solid #00ffff;
+    z-index: 1000;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.chat-container.open {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.chat-container.closed {
+    opacity: 0;
+    transform: translateY(-50%) translateX(100%);
+    pointer-events: none;
+}
+
+.chat-container h3 {
+    margin: 0 0 15px;
+    font-size: 24px;
+    text-align: center;
+    color: #00ffff;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    scrollbar-color: #00ffff #1a1a2e;
+    scrollbar-width: thin;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #00ffff;
+    border-radius: 3px;
+}
+
+.chat-message {
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 60ch; /* Máximo 60 caracteres por línea */
+    word-break: break-word; /* Quebrar palabras largas */
+    display: flex;
+    flex-direction: column; /* Apilar nombre y mensaje */
+    font-size: 15px;
+}
+
+.chat-message strong {
+    display: block; /* Nombre en línea separada */
+    margin-bottom: 4px; /* Espacio entre nombre y mensaje */
+    color: #ffff00;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-message.own {
+    background: linear-gradient(145deg, #6344ee5e, #99f882c4);
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.chat-message.other {
+    background: linear-gradient(145deg, #6344ee5e, #e46969d3);
+    align-self: flex-start;
+    margin-right: auto;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0, 204, 255, 0.5);
+}
+
+.chat-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #00ffff;
+    background: #2e2e4a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    transition: box-shadow 0.2s ease;
+}
+
+.chat-input:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.chat-send-btn {
+    padding: 10px 16px;
+    font-size: 15px;
+    background: linear-gradient(145deg, #ff0066, #ff3399);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Bangers', cursive;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chat-send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+}
+
+/* BOTÓN DENTRO DEL GAMEPLAY (MÓVILES Y PC) */
+.chat-toggle-btn-gameplay {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: linear-gradient(145deg, #6ce426, #ff3399);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: 'Bangers', cursive;
+    z-index: 1001;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chat-toggle-btn-gameplay:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255, 0, 102, 0.7);
+}
+
+/* Efecto de zoom para notificación de mensajes nuevos */
+.chat-toggle-btn-gameplay.new-message {
+    animation: subtle-zoom 0.8s infinite;
+}
+
+@keyframes subtle-zoom {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Punto rojo para notificación */
+.notification-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+    #root {
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .gameplay {
+        width: 900px;
+        height: 100vh;
+        background-size: cover;
+        background-position: center -6vh;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .chat-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - env(keyboard-inset-height, 0px));
+        border-radius: 0;
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        border: none;
+        padding: 2vw;
+        padding-bottom: 5vw;
+        box-sizing: border-box;
+    }
+
+    .chat-container.open {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .chat-container.closed {
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .chat-toggle-btn-gameplay {
+        top: 0vw;
+        right: 1vw;
+        font-size: 4.2vw;
+        padding: 2vw 2vw;
+        border-radius: 200vw;
+    }
+
+    .chat-container h3 {
+        margin: 0 0 15px;
+        font-size: 24px;
+        text-align: center;
+        color: #0c0c0c;
+        text-shadow: 0 0 5px rgba(0, 247, 255, 0.432);
+    }
+
+    .chat-messages {
+        font-size: 4vw;
+        padding: 2vw;
+        border-radius: 1vw;
+        margin-bottom: 25vw;
+    }
+
+    .chat-message {
+        font-size: 4vw;
+        padding: 2vw 3vw;
+        margin: 1.5vw 0;
+        max-width: 60ch;
+        word-break: break-word;
+        display: flex;
+        flex-direction: column;
+        border-radius: 2vw;
+    }
+
+    .chat-message strong {
+        display: block;
+        margin-bottom: 1vw;
+        font-size: 4vw;
+    }
+
+    .chat-input {
+        font-size: 4vw;
+        padding: 2.5vw;
+        border-radius: 2vw;
+        margin-bottom: 8vw;
+    }
+
+    .chat-send-btn {
+        font-size: 4vw;
+        padding: 2.5vw 4vw;
+        border-radius: 2vw;
+        background: linear-gradient(145deg, #54df5488, #1ad3ecbb);
+        margin-bottom: 8vw;
+    }
+
+    .chat-form {
+        position: absolute;
+        bottom: 10vw;
+        left: 2vw;
+        right: 2vw;
+        width: calc(100% - 4vw);
+        gap: 2vw;
+        margin-top: 2vw;
+    }
+
+    .chat-toggle-btn-gameplay.new-message {
+        animation: subtle-zoom 0.8s infinite;
+    }
+
+    .notification-dot {
+        top: 0.5vw;
+        right: 0.5vw;
+        width: 2vw;
+        height: 2vw;
+        border: 0.2vw solid #ffffff;
+    }
+
+    .round {
+        top: -160px;
+        left: 50%;
+        transform: translateX(-50%) skewX(-5deg);
+        font-size: 20px;
+        padding: 6px 9px;
+    }
+
+    .score-container {
+        position: absolute;
+        top: 430px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        gap: 250px;
+        pointer-events: none;
+        z-index: 100;
+        filter: drop-shadow(0 0 8px rgba(255, 50, 50, 0.7));
+    }
+
+    .gameplay.in-game .score-container {
+        top: 430px;
+    }
+
+    .score-container .score-player {
+        font-family: 'Anton', sans-serif;
+        font-size: 29px;
+        padding: 17px 1px;
+        line-height: 1;
+        border: 3px solid #000;
+        position: relative;
+        background: linear-gradient(145deg, #ff0000, #cc0000);
+        color: #fff;
+        border-radius: 15px;
+        text-shadow:
+            -3px -3px 0 #000,
+            3px -3px 0 #000,
+            -3px 3px 0 #000,
+            3px 3px 0 #000,
+            0 0 10px rgba(255, 215, 0, 0.7);
+        box-shadow: 
+            0 6px 0 #000,
+            0 0 20px rgba(255, 0, 0, 0.5);
+        animation: 
+            scorePulse 1.5s infinite ease-in-out,
+            animeGlow 2s infinite alternate;
+        min-width: 60px;
+        text-align: center;
+        transform: translateX(0);
+    }
+
+    .score-container .score-player.player1-score {
+        transform: translateX(-100%);
+    }
+
+    .score-container .score-player.player2-score {
+        transform: translateX(100%);
+    }
+
+    .score-container .score-player::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        border: 2px dashed rgba(255, 255, 0, 0.6);
+        border-radius: 18px;
+        animation: rotateBorder 4s linear infinite;
+        z-index: -1;
+    }
+
+    .score-container .score-player::after {
+        content: '✦✦';
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffcc00;
+        font-size: 24px;
+        animation: sparkle 1.5s infinite;
+    }
+
+    .timer.player1-timer {
+        top: -9px;
+        left: 108px;
+    }
+
+    .timer.player2-timer {
+        top: -9px;
+        right: 109px;
+    }
+
+    .player-name, .round, .score-player {
+        font-family: 'Anton', sans-serif;
+    }
+
+    .turn {
+        position: absolute;
+        top: 455px;
+        left: 50%;
+        height: 18px;
+        transform: translateX(-50%);
+    }
+
+    .player-icon.player1 {
+        position: absolute;
+        top: -130px;
+        left: 130px;
+        width: 70px;
+        height: 70px;
+    }
+
+    .player-icon.player2 {
+        position: absolute;
+        top: -130px;
+        left: 393px;
+        width: 70px;
+        height: 70px;
+    }
+
+    .player1-name {
+        position: absolute;
+        top: -55px;
+        left: 110px;
+    }
+
+    .player2-name {
+        position: absolute;
+        top: -55px;
+        right: -11231238px;
+    }
+
+    .gameplay.in-game .player1-name { left: 110px; }
+    .gameplay.waiting .player1-name { left: 15px; }
+
+    .gameplay.in-game .player-icon.player1 { left: 133px; }
+    .gameplay.waiting .player-icon.player1 { left: 35px; }
+}
