@@ -32,7 +32,7 @@ const App = () => {
 
         const wsUrl = window.location.hostname === 'localhost'
             ? 'ws://localhost:8080'
-            : 'wss://basquetonline.onrender.com';
+            : 'wss://basquetonline-servidor.onrender.com';
 
         wsRef.current = new WebSocket(wsUrl);
 
