@@ -36,6 +36,7 @@ const App = () => {
           ...prev,
           { username: data.username, message: data.message, timestamp: data.timestamp }
         ]);
+        SoundManager.playSound('chatNotification');
         return;
       }
 
@@ -132,6 +133,13 @@ const App = () => {
       window.closeWebSocket();
     };
   }, []);
+
+  useEffect(() => {
+    // Detener sonidos en pantallas que no sean gameplay
+    if (screen !== 'gameplay') {
+      SoundManager.stopAll();
+    }
+  }, [screen]);
 
   const sendChatMessage = (message) => {
     if (message.trim()) {
