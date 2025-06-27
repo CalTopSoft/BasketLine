@@ -106,15 +106,20 @@ const App = () => {
 
       if (data.type === 'end') {
         setWinner(data.winner);
-        setScreen('result');
         setGameStarted(false);
         setChatMessages([]);
         SoundManager.stopWheels();
-        SoundManager.stopBackground(); // Detener fondo al finalizar
+        SoundManager.stopBackground();
         if (data.winner === nameRef.current) {
           SoundManager.playSound('win');
+          // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
+          setTimeout(() => setScreen('result'), 6000);
         } else if (data.winner !== 'tie' && data.winner !== 'Desconectado') {
           SoundManager.playSound('lose');
+          // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
+          setTimeout(() => setScreen('result'), 6000);
+        } else {
+          setScreen('result');
         }
       }
 
@@ -136,8 +141,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // Detener sonidos en pantallas que no sean gameplay
-    if (screen !== 'gameplay') {
+    // Detener sonidos en pantallas que no sean gameplay, excepto si es result
+    if (screen !== 'gameplay' && screen !== 'result') {
       SoundManager.stopAll();
     }
   }, [screen]);
