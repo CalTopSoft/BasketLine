@@ -1,6 +1,6 @@
 const IconSelection = ({ onSelect, onBack }) => {
     const { useState } = React;
-    const [category, setCategory] = useState('Memes');
+    const [category, setCategory] = useState('Caricaturas');
 
     const memeIcons = [
         { path: 'img/iconos/memes/meme1.png', name: 'Tralalero' },
