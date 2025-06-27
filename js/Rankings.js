@@ -1,11 +1,23 @@
 // js/Rankings.js
 const Rankings = ({ setScreen, rankingsRef }) => {
-  const { useEffect } = React;
+  const { useEffect, useState } = React;
+  const [rankings, setRankings] = useState(rankingsRef.current);
 
   useEffect(() => {
     // Enviar getRankings al montar el componente
     window.sendMessage({ type: 'getRankings' });
-  }, []);
+
+    // Actualizar el estado cuando rankingsRef cambie
+    const checkRankings = () => {
+      if (rankingsRef.current.length > 0 && rankings.length === 0) {
+        setRankings(rankingsRef.current);
+      }
+    };
+
+    // Revisar cada 100ms hasta que lleguen los rankings
+    const interval = setInterval(checkRankings, 100);
+    return () => clearInterval(interval); // Limpiar el intervalo al desmontar
+  }, [rankings]);
 
   return (
     <div className="rankings-container">
@@ -66,10 +78,10 @@ const Rankings = ({ setScreen, rankingsRef }) => {
       {/* Contenido principal de rankings */}
       <h1 className="rankings-title">Rankings</h1>
       <div className="rankings-list">
-        {rankingsRef.current.length === 0 ? (
+        {rankings.length === 0 ? (
           <div className="loading-text">Cargando rankings...</div>
         ) : (
-          rankingsRef.current.map((entry, index) => (
+          rankings.map((entry, index) => (
             <div key={index} className="ranking-item">
               <span className="ranking-position">{index + 1}</span>
               <span className="ranking-name">{entry.name}</span>
