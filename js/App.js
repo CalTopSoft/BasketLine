@@ -1,4 +1,3 @@
-// js/App.js
 const { useState, useEffect, useRef } = React;
 
 const App = () => {
