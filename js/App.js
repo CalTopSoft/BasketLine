@@ -113,11 +113,11 @@ const App = () => {
         if (data.winner === nameRef.current) {
           SoundManager.playSound('win');
           // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
-          setTimeout(() => setScreen('result'), 6000);
+          setTimeout(() => setScreen('result'), 0);
         } else if (data.winner !== 'tie' && data.winner !== 'Desconectado') {
           SoundManager.playSound('lose');
           // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
-          setTimeout(() => setScreen('result'), 6000);
+          setTimeout(() => setScreen('result'), 0);
         } else {
           setScreen('result');
         }
