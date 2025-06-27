@@ -55,10 +55,10 @@ const IconSelection = ({ onSelect, onBack }) => {
 
             <div className="category-tabs">
                 <button
-                    className={`category-tab ${category === 'Memes' ? 'active' : ''}`}
-                    onClick={() => setCategory('Memes')}
+                    className={`category-tab ${category === 'Caricaturas' ? 'active' : ''}`}
+                    onClick={() => setCategory('Caricaturas')}
                 >
-                    Memes
+                    Caricaturas
                 </button>
                 <button
                     className={`category-tab ${category === 'Gatos' ? 'active' : ''}`}
@@ -67,10 +67,10 @@ const IconSelection = ({ onSelect, onBack }) => {
                     Gatos
                 </button>
                 <button
-                    className={`category-tab ${category === 'Caricaturas' ? 'active' : ''}`}
-                    onClick={() => setCategory('Caricaturas')}
+                    className={`category-tab ${category === 'Memes' ? 'active' : ''}`}
+                    onClick={() => setCategory('Memes')}
                 >
-                    Caricaturas
+                    Memes
                 </button>
             </div>
 
