@@ -21,6 +21,7 @@ const App = () => {
   const lastBallStateRef = useRef(null);
   const selectedIconRef = useRef('img/iconos/memes/meme1.png');
   const playerIconsRef = useRef(['img/iconos/memes/meme1.png', 'img/iconos/memes/meme1.png']);
+  const isPlayingEndSound = useRef(false); // Bandera para sonidos win/lose
 
   const ballRef = useRef(null);
   const hoopXRef = useRef(null);
@@ -111,16 +112,13 @@ const App = () => {
         SoundManager.stopWheels();
         SoundManager.stopBackground();
         if (data.winner === nameRef.current) {
+          isPlayingEndSound.current = true;
           SoundManager.playSound('win');
-          // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
-          setTimeout(() => setScreen('result'), 0);
         } else if (data.winner !== 'tie' && data.winner !== 'Desconectado') {
+          isPlayingEndSound.current = true;
           SoundManager.playSound('lose');
-          // Retrasar cambio de pantalla para permitir que el sonido se reproduzca
-          setTimeout(() => setScreen('result'), 0);
-        } else {
-          setScreen('result');
         }
+        setScreen('result');
       }
 
       if (data.type === 'rankings') {
@@ -134,15 +132,23 @@ const App = () => {
       }
     });
 
+    // Escuchar cuando win o lose terminan para resetear la bandera
+    const handleEndSoundFinished = () => {
+      isPlayingEndSound.current = false;
+    };
+
+    window.addEventListener('endSoundFinished', handleEndSoundFinished);
+
     return () => {
       SoundManager.cleanup();
       window.closeWebSocket();
+      window.removeEventListener('endSoundFinished', handleEndSoundFinished);
     };
   }, []);
 
   useEffect(() => {
-    // Detener sonidos en pantallas que no sean gameplay, excepto si es result
-    if (screen !== 'gameplay' && screen !== 'result') {
+    // Detener sonidos en pantallas que no sean gameplay, pero no si win/lose están sonando
+    if (screen !== 'gameplay' && !isPlayingEndSound.current) {
       SoundManager.stopAll();
     }
   }, [screen]);
@@ -161,6 +167,10 @@ const App = () => {
   const handleSetScreen = (newScreen) => {
     if (['home', 'rooms', 'result'].includes(newScreen)) {
       setChatMessages([]);
+    }
+    // Resetear la bandera al cambiar de pantalla manualmente
+    if (newScreen !== 'result') {
+      isPlayingEndSound.current = false;
     }
     setScreen(newScreen);
   };
