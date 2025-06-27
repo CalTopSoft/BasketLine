@@ -110,6 +110,7 @@ const App = () => {
         setGameStarted(false);
         setChatMessages([]);
         SoundManager.stopWheels();
+        SoundManager.stopBackground(); // Detener fondo al finalizar
         if (data.winner === nameRef.current) {
           SoundManager.playSound('win');
         } else if (data.winner !== 'tie' && data.winner !== 'Desconectado') {
