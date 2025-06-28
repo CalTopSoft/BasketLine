@@ -100,7 +100,11 @@ const Gameplay = ({
                     const ballDiameter = ballSize * 2;
                     
                     // Solo aplicar rotación si hay movimiento significativo
-                    if ((ballRef.current.vx || 0) > 0.1 || (ballRef.current.vy || 0) > 0.1 || (ballRef.current.rotation || 0) !== 0) {
+                    const hasVelocity = (ballRef.current.vx && Math.abs(ballRef.current.vx) > 0.1) || 
+                                      (ballRef.current.vy && Math.abs(ballRef.current.vy) > 0.1);
+                    const hasRotation = ballRef.current.rotation && ballRef.current.rotation !== 0;
+                    
+                    if (hasVelocity || hasRotation) {
                         p.push();
                         p.translate(ballRef.current.x, ballRef.current.y);
                         p.rotate(ballRef.current.rotation || 0);
@@ -169,7 +173,7 @@ const Gameplay = ({
                 const vx = power * Math.cos(angle);
                 const vy = power * Math.sin(angle);
 
-                if (wsRef.current?.readyState === 1) {
+                if (wsRef.current && wsRef.current.readyState === 1) {
                     wsRef.current.send(
                         JSON.stringify({
                             type: 'shot',
@@ -191,7 +195,7 @@ const Gameplay = ({
 
         // Eventos de touch optimizados para móvil
         p.touchStarted = (event) => {
-            if (event.touches?.length > 0) {
+            if (event.touches && event.touches.length > 0) {
                 const rect = p.canvas.getBoundingClientRect();
                 const touch = event.touches[0];
                 const x = touch.clientX - rect.left;
@@ -202,7 +206,7 @@ const Gameplay = ({
         };
 
         p.touchEnded = (event) => {
-            if (event.changedTouches?.length > 0) {
+            if (event.changedTouches && event.changedTouches.length > 0) {
                 const rect = p.canvas.getBoundingClientRect();
                 const touch = event.changedTouches[0];
                 const x = touch.clientX - rect.left;
@@ -240,7 +244,8 @@ const Gameplay = ({
                     let needsUpdate = false;
                     
                     if (data.ball) {
-                        Object.assign(ballRef.current || {}, data.ball);
+                        ballRef.current = ballRef.current || {};
+                        Object.assign(ballRef.current, data.ball);
                         if (!ballRef.current.r) ballRef.current.r = 30;
                         needsUpdate = true;
                     }
@@ -259,7 +264,7 @@ const Gameplay = ({
                     
                     // Solo forzar re-render si hay cambios importantes
                     if (needsUpdate) {
-                        setForceUpdate((prev) => prev + 1);
+                        setForceUpdate(function(prev) { return prev + 1; });
                     }
                 }
             } catch (error) {
@@ -283,50 +288,52 @@ const Gameplay = ({
         };
     }, [gameStarted]);
 
-    return (
-        <div className={`gameplay ${gameStarted ? 'in-game' : 'waiting'}`}>
-            <div className="game-container">
-                <div ref={sketchRef}></div>
+    return React.createElement('div', { className: 'gameplay ' + (gameStarted ? 'in-game' : 'waiting') },
+        React.createElement('div', { className: 'game-container' },
+            React.createElement('div', { ref: sketchRef }),
 
-                <div className="score-container">
-                    <div className="score-player player1-score">{scoresRef.current[0]}</div>
-                    <div className="score-player player2-score">{scoresRef.current[1]}</div>
-                </div>
+            React.createElement('div', { className: 'score-container' },
+                React.createElement('div', { className: 'score-player player1-score' }, scoresRef.current[0]),
+                React.createElement('div', { className: 'score-player player2-score' }, scoresRef.current[1])
+            ),
 
-                <div className="turn">Turno: {playersRef.current[turnRef.current] || 'Esperando...'}</div>
-                <div className="round">Ronda {roundRef.current}/3</div>
+            React.createElement('div', { className: 'turn' }, 'Turno: ' + (playersRef.current[turnRef.current] || 'Esperando...')),
+            React.createElement('div', { className: 'round' }, 'Ronda ' + roundRef.current + '/3'),
 
-                {playersRef.current[0] && (
-                    <React.Fragment>
-                        <div className="player-icon player1">
-                            <img src={playerIconsRef.current[0]} alt="Player 1" />
-                        </div>
-                        <div className="player-name player1-name">{playersRef.current[0]}</div>
-                    </React.Fragment>
-                )}
+            playersRef.current[0] && React.createElement(React.Fragment, null,
+                React.createElement('div', { className: 'player-icon player1' },
+                    React.createElement('img', { src: playerIconsRef.current[0], alt: 'Player 1' })
+                ),
+                React.createElement('div', { className: 'player-name player1-name' }, playersRef.current[0])
+            ),
 
-                {playersRef.current[1] && (
-                    <React.Fragment>
-                        <div className="player-icon player2">
-                            <img src={playerIconsRef.current[1]} alt="Player 2" />
-                        </div>
-                        <div className="player-name player2-name">{playersRef.current[1]}</div>
-                    </React.Fragment>
-                )}
+            playersRef.current[1] && React.createElement(React.Fragment, null,
+                React.createElement('div', { className: 'player-icon player2' },
+                    React.createElement('img', { src: playerIconsRef.current[1], alt: 'Player 2' })
+                ),
+                React.createElement('div', { className: 'player-name player2-name' }, playersRef.current[1])
+            ),
 
-                {gameStarted && (
-                    <React.Fragment>
-                        <div className={`timer player1-timer ${turnRef.current === 0 ? 'active' : ''}`}>
-                            <div className="timer-bar" style={{ width: `${timerRef.current * 12.5}%` }}></div>
-                        </div>
-                        <div className={`timer player2-timer ${turnRef.current === 1 ? 'active' : ''}`}>
-                            <div className="timer-bar" style={{ width: `${timerRef.current * 12.5}%` }}></div>
-                        </div>
-                    </React.Fragment>
-                )}
+            gameStarted && React.createElement(React.Fragment, null,
+                React.createElement('div', { 
+                    className: 'timer player1-timer' + (turnRef.current === 0 ? ' active' : '') 
+                },
+                    React.createElement('div', { 
+                        className: 'timer-bar', 
+                        style: { width: (timerRef.current * 12.5) + '%' } 
+                    })
+                ),
+                React.createElement('div', { 
+                    className: 'timer player2-timer' + (turnRef.current === 1 ? ' active' : '') 
+                },
+                    React.createElement('div', { 
+                        className: 'timer-bar', 
+                        style: { width: (timerRef.current * 12.5) + '%' } 
+                    })
+                )
+            ),
 
-                {!gameStarted && <div className="waiting-message">Esperando al segundo jugador...</div>}
-            </div>
-        </div>
+            !gameStarted && React.createElement('div', { className: 'waiting-message' }, 'Esperando al segundo jugador...')
+        )
     );
 };
