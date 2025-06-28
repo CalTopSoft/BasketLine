@@ -27,6 +27,8 @@ const Gameplay = ({
         let dragging = false;
         let dragStartX, dragStartY;
         let ballScale = 1;
+        let lastFPSTime = 0; // Para controlar la actualización de FPS
+        let fpsDisplay = 0; // Para almacenar el valor de FPS
 
         p.preload = () => {
             ballImg = p.loadImage('img/balon/ball.png');
@@ -92,11 +94,15 @@ const Gameplay = ({
                 p.text("Imágenes no cargadas - modo debug", 10, 20);
             }
 
-            // Contador de FPS
+            // Contador de FPS centrado, actualizado cada 500ms
+            if (p.millis() - lastFPSTime > 500) {
+                fpsDisplay = Math.round(p.frameRate());
+                lastFPSTime = p.millis();
+            }
             p.fill(255); // Color blanco para el texto
             p.textSize(16); // Tamaño del texto
-            p.textAlign(p.LEFT, p.TOP); // Alineación en esquina superior izquierda
-            p.text(`FPS: ${Math.round(p.frameRate())}`, 10, 10); // Mostrar FPS
+            p.textAlign(p.CENTER, p.TOP); // Alineación centrada horizontalmente, arriba
+            p.text(`FPS: ${fpsDisplay}`, 300, 10); // Mostrar FPS en el centro (x=300)
         };
 
         p.mousePressed = () => {
