@@ -1,5 +1,4 @@
 const { useState, useEffect, useRef } = React;
-
 const Gameplay = ({
     name,
     wsRef,
@@ -20,15 +19,30 @@ const Gameplay = ({
     const sketchRef = useRef(null);
     const p5Instance = useRef(null);
     const isMounted = useRef(false);
-    const updateCounterRef = useRef(0);
 
     const setupSketch = (p) => {
         let ballImg, hoopBaseImg, hoopRingImg;
         let dragging = false;
         let dragStartX, dragStartY;
         let ballScale = 1;
-        let lastFPSTime = 0; // Para controlar la actualización de FPS
-        let fpsDisplay = 0; // Para almacenar el valor de FPS
+        
+        // Cache para optimización crítica
+        let lastBallY = -1;
+        let cachedBallScale = 1;
+        let lastHoopX = -1;
+        let hoopBaseX, hoopRingX;
+        
+        // Pre-calcular constantes
+        const HOOP_BASE_WIDTH = 240;
+        const HOOP_BASE_HEIGHT = HOOP_BASE_WIDTH * (3464 / 2598);
+        const HOOP_RING_WIDTH = 75;
+        const HOOP_RING_HEIGHT = HOOP_RING_WIDTH * (499 / 788);
+        const HOOP_BASE_OFFSET = HOOP_BASE_WIDTH / 1.98;
+        const HOOP_RING_OFFSET = HOOP_RING_WIDTH / 2.2;
+        const HOOP_RING_Y = 113;
+        
+        // Detectar móvil para optimizaciones específicas
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         p.preload = () => {
             ballImg = p.loadImage('img/balon/ball.png');
@@ -39,106 +53,123 @@ const Gameplay = ({
 
         p.setup = () => {
             p.createCanvas(600, 490);
-            p.frameRate(62);
+            p.frameRate(60); // Mantener 60fps
+            
+            // Optimizaciones específicas para móvil
+            if (isMobile) {
+                p.pixelDensity(1); // Reducir carga de GPU
+            }
+            
+            // Configuraciones para mejor rendimiento
+            p.imageMode(p.CORNER);
+            p.rectMode(p.CORNER);
         };
 
         p.draw = () => {
+            // Usar clear() es más eficiente que background()
             p.clear();
             
+            // Inicializar ball si no existe
             if (!ballRef.current) {
                 ballRef.current = { x: 300, y: 405, r: 30, vx: 0, vy: 0, thrown: false, rotation: 0 };
             }
             if (!ballRef.current.r) ballRef.current.r = 30;
             if (!hoopXRef.current) hoopXRef.current = 300;
 
-            const hoopBaseWidth = 240;
-            const hoopBaseHeight = hoopBaseWidth * (3464 / 2598);
-            const hoopRingWidth = 75;
-            const hoopRingHeight = hoopRingWidth * (499 / 788);
+            // Cache del cálculo de escala - solo cuando cambia Y
+            if (lastBallY !== ballRef.current.y) {
+                cachedBallScale = p.constrain(p.map(ballRef.current.y, 405, 113, 1, 0.8), 0.8, 1);
+                lastBallY = ballRef.current.y;
+            }
+            ballScale = cachedBallScale;
+            
+            // Cache de posiciones del aro - solo cuando cambia X
+            if (lastHoopX !== hoopXRef.current) {
+                hoopBaseX = hoopXRef.current - HOOP_BASE_OFFSET;
+                hoopRingX = hoopXRef.current - HOOP_RING_OFFSET;
+                lastHoopX = hoopXRef.current;
+            }
 
             if (ballImg && hoopBaseImg && hoopRingImg) {
-                p.image(hoopBaseImg, hoopXRef.current - hoopBaseWidth / 1.98, 40, hoopBaseWidth, hoopBaseHeight);
+                // Dibujar base del aro
+                p.image(hoopBaseImg, hoopBaseX, 40, HOOP_BASE_WIDTH, HOOP_BASE_HEIGHT);
                 
-                ballScale = p.map(ballRef.current.y, 405, 113, 1, 0.8);
-                ballScale = p.constrain(ballScale, 0.8, 1);
-
+                // Función optimizada para dibujar pelota rotada
                 const drawRotatedBall = () => {
-                    p.push();
-                    p.translate(ballRef.current.x, ballRef.current.y);
-                    p.rotate(ballRef.current.rotation || 0);
-                    p.image(
-                        ballImg,
-                        -ballRef.current.r * ballScale,
-                        -ballRef.current.r * ballScale,
-                        ballRef.current.r * 2 * ballScale,
-                        ballRef.current.r * 2 * ballScale
-                    );
-                    p.pop();
+                    const ballSize = ballRef.current.r * ballScale;
+                    const ballDiameter = ballSize * 2;
+                    
+                    // Solo aplicar rotación si hay movimiento significativo
+                    if ((ballRef.current.vx || 0) > 0.1 || (ballRef.current.vy || 0) > 0.1 || (ballRef.current.rotation || 0) !== 0) {
+                        p.push();
+                        p.translate(ballRef.current.x, ballRef.current.y);
+                        p.rotate(ballRef.current.rotation || 0);
+                        p.image(ballImg, -ballSize, -ballSize, ballDiameter, ballDiameter);
+                        p.pop();
+                    } else {
+                        // Sin rotación para mejor performance cuando está estática
+                        p.image(ballImg, ballRef.current.x - ballSize, ballRef.current.y - ballSize, ballDiameter, ballDiameter);
+                    }
                 };
 
+                // Optimizar orden de dibujo basado en Z-index
                 if (ballRef.current.vy > 0) {
                     drawRotatedBall();
-                    p.image(hoopRingImg, hoopXRef.current - hoopRingWidth / 2.2, 113, hoopRingWidth, hoopRingHeight);
+                    p.image(hoopRingImg, hoopRingX, HOOP_RING_Y, HOOP_RING_WIDTH, HOOP_RING_HEIGHT);
                 } else {
-                    p.image(hoopRingImg, hoopXRef.current - hoopRingWidth / 2.2, 113, hoopRingWidth, hoopRingHeight);
+                    p.image(hoopRingImg, hoopRingX, HOOP_RING_Y, HOOP_RING_WIDTH, HOOP_RING_HEIGHT);
                     drawRotatedBall();
                 }
             } else {
+                // Modo debug más eficiente
+                p.noStroke();
                 p.fill(255, 165, 0);
-                p.ellipse(ballRef.current.x, ballRef.current.y, ballRef.current.r * 2 * ballScale);
+                const debugBallSize = ballRef.current.r * 2 * ballScale;
+                p.ellipse(ballRef.current.x, ballRef.current.y, debugBallSize);
                 
                 p.fill(255, 0, 0);
-                p.rect(hoopXRef.current - 37.5, 113, 75, 20);
+                p.rect(hoopXRef.current - 37.5, HOOP_RING_Y, 75, 20);
                 
                 p.fill(255);
-                p.text("Imágenes no cargadas - modo debug", 10, 20);
+                p.textSize(12);
+                p.text("Debug mode", 10, 20);
             }
-
-            // Contador de FPS centrado, actualizado cada 500ms
-            if (p.millis() - lastFPSTime > 500) {
-                fpsDisplay = Math.round(p.frameRate());
-                lastFPSTime = p.millis();
-            }
-            p.fill(255); // Color blanco para el texto
-            p.textSize(16); // Tamaño del texto
-            p.textAlign(p.CENTER, p.TOP); // Alineación centrada horizontalmente, arriba
-            p.text(`FPS: ${fpsDisplay}`, 300, 10); // Mostrar FPS en el centro (x=300)
         };
 
-        p.mousePressed = () => {
+        // Función optimizada para manejar inicio de arrastre
+        const handleDragStart = (x, y) => {
             if (
                 gameStarted &&
                 turnRef.current === playerIndexRef.current &&
                 !ballRef.current.thrown &&
                 attemptsRef.current[playerIndexRef.current] < 5
             ) {
-                const ballCenterX = ballRef.current.x;
-                const ballCenterY = ballRef.current.y;
                 const ballRadius = ballRef.current.r * ballScale;
                 
-                const distance = Math.sqrt(
-                    Math.pow(p.mouseX - ballCenterX, 2) + 
-                    Math.pow(p.mouseY - ballCenterY, 2)
-                );
+                // Optimización: usar distancia al cuadrado para evitar sqrt
+                const distanceSquared = Math.pow(x - ballRef.current.x, 2) + Math.pow(y - ballRef.current.y, 2);
+                const radiusSquared = ballRadius * ballRadius;
                 
-                if (distance <= ballRadius) {
+                if (distanceSquared <= radiusSquared) {
                     dragging = true;
-                    dragStartX = p.mouseX;
-                    dragStartY = p.mouseY;
+                    dragStartX = x;
+                    dragStartY = y;
                 }
             }
         };
 
-        p.mouseReleased = () => {
+        // Función optimizada para manejar fin de arrastre
+        const handleDragEnd = (x, y) => {
             if (dragging) {
-                const dx = p.mouseX - dragStartX;
-                const dy = p.mouseY - dragStartY;
-                const power = Math.min(Math.max(Math.sqrt(dx * dx + dy * dy) / 10, 0.2), 15.5);
+                const dx = x - dragStartX;
+                const dy = y - dragStartY;
+                const distanceSquared = dx * dx + dy * dy;
+                const power = Math.min(Math.max(Math.sqrt(distanceSquared) / 10, 0.2), 15.5);
                 const angle = Math.atan2(dy, dx);
                 const vx = power * Math.cos(angle);
                 const vy = power * Math.sin(angle);
 
-                if (wsRef.current && wsRef.current.readyState === 1) {
+                if (wsRef.current?.readyState === 1) {
                     wsRef.current.send(
                         JSON.stringify({
                             type: 'shot',
@@ -154,10 +185,36 @@ const Gameplay = ({
             }
         };
 
-        p.mouseDragged = () => {
-            if (dragging) {
-                // Opcional: mostrar línea de trayectoria
+        // Eventos de mouse
+        p.mousePressed = () => handleDragStart(p.mouseX, p.mouseY);
+        p.mouseReleased = () => handleDragEnd(p.mouseX, p.mouseY);
+
+        // Eventos de touch optimizados para móvil
+        p.touchStarted = (event) => {
+            if (event.touches?.length > 0) {
+                const rect = p.canvas.getBoundingClientRect();
+                const touch = event.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                handleDragStart(x, y);
+                return false;
             }
+        };
+
+        p.touchEnded = (event) => {
+            if (event.changedTouches?.length > 0) {
+                const rect = p.canvas.getBoundingClientRect();
+                const touch = event.changedTouches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                handleDragEnd(x, y);
+                return false;
+            }
+        };
+
+        // Eliminar mouseDragged completamente - no es necesario y consume recursos
+        p.mouseDragged = () => {
+            // Vacío intencionalmente para mejor performance
         };
     };
 
@@ -167,25 +224,46 @@ const Gameplay = ({
             isMounted.current = true;
         }
 
+        // Optimizar manejo de WebSocket - usar throttling implícito
+        let lastUpdateTime = 0;
         const handleMessage = (event) => {
-            const data = JSON.parse(event.data);
+            const now = performance.now();
+            // Throttle a máximo 60 actualizaciones por segundo
+            if (now - lastUpdateTime < 16.67) return;
+            lastUpdateTime = now;
             
-            if (['update', 'newRound', 'scoreUpdate', 'start', 'joined'].includes(data.type)) {
-                if (data.ball) {
-                    ballRef.current = { ...ballRef.current, ...data.ball };
-                    if (!ballRef.current.r) ballRef.current.r = 30;
-                }
-                if (data.hoopX !== undefined) hoopXRef.current = data.hoopX;
-                if (data.timer !== undefined) timerRef.current = data.timer;
-                if (data.attempts) attemptsRef.current = data.attempts;
-                if (data.playerIcons) playerIconsRef.current = data.playerIcons;
-                if (data.scores) scoresRef.current = data.scores;
-                if (data.turn !== undefined) turnRef.current = data.turn;
-                if (data.round !== undefined) roundRef.current = data.round;
-                if (data.players) playersRef.current = data.players;
-                if (data.playerIndex !== undefined) playerIndexRef.current = data.playerIndex;
+            try {
+                const data = JSON.parse(event.data);
                 
-                setForceUpdate((prev) => prev + 1);
+                if (['update', 'newRound', 'scoreUpdate', 'start', 'joined'].includes(data.type)) {
+                    // Actualización batch para mejor performance
+                    let needsUpdate = false;
+                    
+                    if (data.ball) {
+                        Object.assign(ballRef.current || {}, data.ball);
+                        if (!ballRef.current.r) ballRef.current.r = 30;
+                        needsUpdate = true;
+                    }
+                    if (data.hoopX !== undefined) { 
+                        hoopXRef.current = data.hoopX;
+                        needsUpdate = true;
+                    }
+                    if (data.timer !== undefined) timerRef.current = data.timer;
+                    if (data.attempts) attemptsRef.current = data.attempts;
+                    if (data.playerIcons) playerIconsRef.current = data.playerIcons;
+                    if (data.scores) scoresRef.current = data.scores;
+                    if (data.turn !== undefined) turnRef.current = data.turn;
+                    if (data.round !== undefined) roundRef.current = data.round;
+                    if (data.players) playersRef.current = data.players;
+                    if (data.playerIndex !== undefined) playerIndexRef.current = data.playerIndex;
+                    
+                    // Solo forzar re-render si hay cambios importantes
+                    if (needsUpdate) {
+                        setForceUpdate((prev) => prev + 1);
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
             }
         };
 
@@ -207,7 +285,6 @@ const Gameplay = ({
 
     return (
         <div className={`gameplay ${gameStarted ? 'in-game' : 'waiting'}`}>
-
             <div className="game-container">
                 <div ref={sketchRef}></div>
 
