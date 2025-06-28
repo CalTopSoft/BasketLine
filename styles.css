@@ -40,23 +40,17 @@ body {
     transition: margin-right 0.3s ease;
 }
 
-
-
 .gameplay.chat-closed {
     margin-right: 0; /* Centrar cuando el chat está cerrado */
 }
 .gameplay.chat-open {
     margin-right: 320px; /* Desplazar a la izquierda cuando el chat está abierto */
 }
-
 .game-container {
     position: relative;
-    width: 100%;
-    max-width: 600px;
-    aspect-ratio: 3 / 2; /* Mantiene proporción 600x400 */
+    width: 600px;
+    height: 400px;
 }
-
-
 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -84,7 +78,7 @@ input {
 
 .score-container {
     position: absolute;
-    top: 370px;
+    top: 420px;
     left: -30px;
     width: 100%;
     display: flex;
@@ -166,7 +160,7 @@ input {
 
 .turn {
     position: absolute;
-    bottom: -65px;
+    bottom: -100px;
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
@@ -238,8 +232,9 @@ input {
 
 .round {
     position: absolute;
-    top: -65px;
-    left: -65px;
+    top: -85px;
+    left: 50%;
+    transform: translateX(-50%) skewX(-5deg);
     font-family: 'Bangers', cursive;
     font-size: 23px;
     font-weight: 700;
@@ -253,9 +248,9 @@ input {
     cursor: default;
     background-color: #1f4d91;
     text-shadow: 2px 2px 0 #000;
-    transform: skewX(-5deg);
     overflow: hidden;
 }
+
 
 .round::before {
     content: '';
@@ -368,12 +363,12 @@ input {
 }
 
 .timer.player1-timer {
-    top: 12px;
-    right: 515px;
+    top: 55px;
+    right: 500px;
 }
 
 .timer.player2-timer {
-    top: 12px;
+    top: 55px;
     right: -40px;
 }
 
@@ -389,8 +384,8 @@ input {
 .player-icon {
     position: absolute;
     top: -70px;
-    width: 56px;
-    height: 56px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     border: 3px solid #000000;
     background-color: #3a3d3d;
@@ -427,8 +422,7 @@ input {
     50% { transform: translateY(-4px); }
 }
 
-.player1 { left: calc(50% - 157px); }
-.player2 { left: calc(50% + 100px); }
+.player-icon.player2 { left: calc(50% - -237px); top: calc(50% - -70);}
 
 .player-name {
     position: absolute;
@@ -461,8 +455,9 @@ input {
     50% { transform: translateY(-5px) skewX(-5deg); }
 }
 
-.player1-name { left: calc(50% - 186px); }
-.player2-name { left: calc(50% + 70px); }
+.player1-name { left: calc(50% - 320px); top: calc(50% - 187px);}
+.player2-name { left: calc(50% + 220px); top: calc(50% - 187px);}
+
 .turn-indicator {
     position: absolute;
     bottom: 10px;
@@ -696,11 +691,7 @@ input {
         align-items: center;
         position: relative;
     }
-    .game-container {
-        position: relative;
-        width: 400px;
-        height: 380px;
-    }
+
     .chat-container {
         position: fixed;
         top: 0;
@@ -810,7 +801,7 @@ input {
     }
 
     .round {
-        top: -150px;
+        top: -160px;
         left: 50%;
         transform: translateX(-50%) skewX(-5deg);
         font-size: 20px;
@@ -947,7 +938,8 @@ input {
 
     .gameplay.in-game .player1-name { left: 110px; }
     .gameplay.waiting .player1-name { left: 15px; }
-
+    .gameplay.in-game .player2-name { left: 370px; }
+    .gameplay.waiting .player2-name { left: 15px; }
     .gameplay.in-game .player-icon.player1 { left: 133px; }
     .gameplay.waiting .player-icon.player1 { left: 35px; }
 }
