@@ -26,9 +26,10 @@ body {
     max-width: 600px;
     width: 100%;
 }
+
 .gameplay {
-    width: 750px;
-    height: 550px;
+    width: 100vw;
+    height: 100vh;
     position: relative;
     overflow: hidden;
     background: url('img/fondo/background.png') no-repeat center center;
@@ -36,19 +37,26 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: margin-right 0.3s ease; /* Transición suave para centrar */
+    transition: margin-right 0.3s ease;
 }
+
+
+
 .gameplay.chat-closed {
     margin-right: 0; /* Centrar cuando el chat está cerrado */
 }
 .gameplay.chat-open {
     margin-right: 320px; /* Desplazar a la izquierda cuando el chat está abierto */
 }
+
 .game-container {
     position: relative;
-    width: 600px;
-    height: 400px;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 3 / 2; /* Mantiene proporción 600x400 */
 }
+
+
 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -688,7 +696,11 @@ input {
         align-items: center;
         position: relative;
     }
-
+    .game-container {
+        position: relative;
+        width: 400px;
+        height: 380px;
+    }
     .chat-container {
         position: fixed;
         top: 0;
@@ -798,7 +810,7 @@ input {
     }
 
     .round {
-        top: -160px;
+        top: -150px;
         left: 50%;
         transform: translateX(-50%) skewX(-5deg);
         font-size: 20px;
@@ -827,7 +839,7 @@ input {
     .score-container .score-player {
         font-family: 'Anton', sans-serif;
         font-size: 29px;
-        padding: 17px 1px;
+        padding: 17px 0.1px;
         line-height: 1;
         border: 3px solid #000;
         position: relative;
