@@ -91,6 +91,12 @@ const Gameplay = ({
                 p.fill(255);
                 p.text("Imágenes no cargadas - modo debug", 10, 20);
             }
+
+            // Contador de FPS
+            p.fill(255); // Color blanco para el texto
+            p.textSize(16); // Tamaño del texto
+            p.textAlign(p.LEFT, p.TOP); // Alineación en esquina superior izquierda
+            p.text(`FPS: ${Math.round(p.frameRate())}`, 10, 10); // Mostrar FPS
         };
 
         p.mousePressed = () => {
