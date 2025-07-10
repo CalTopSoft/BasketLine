@@ -145,7 +145,7 @@ body, html {
     box-shadow: none;
 }
 
-.back-button {
+.back-button, .back-buttonX {
     margin-top: 40px;
     background: linear-gradient(45deg, #0288d1, #29b6f6);
     color: #ffffff;
@@ -161,7 +161,7 @@ body, html {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
 }
 
-.back-button:hover {
+.back-button:hover, .back-buttonX:hover {
     background: linear-gradient(45deg, #29b6f6, #4fc3f7);
     transform: scale(1.1);
     box-shadow: 0 5px 15px rgba(2, 136, 209, 0.7);
@@ -394,12 +394,13 @@ body, html {
     .rooms-container {
         padding: 5px;
         justify-content: flex-start;
-        padding-top: 75px;
+
         
     }
     .rooms-title {
         font-size: 1.9rem;
         margin-bottom: 2px;
+        padding-top: 75px;
     }
     .rooms-list {
         flex-direction: column;
@@ -432,8 +433,14 @@ body, html {
         padding: 10px 15px;
         font-size: 1rem;
         margin-top: 20px;
-        top: -185px !important;
+
     }
+    .back-buttonX{
+        padding: 10px 15px;
+        font-size: 1rem;
+        margin-top: -165px;
+    }
+
     .basketball-ball {
         width: 40px;
         height: 40px;
