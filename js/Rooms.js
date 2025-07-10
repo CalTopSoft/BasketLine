@@ -121,7 +121,7 @@ const Rooms = ({ setScreen, wsRef, roomStatusRef, nameRef }) => { // Agregar nam
                     </div>
                 </div>
 
-                <button className="back-button" onClick={() => setScreen('home')}>
+                <button className="back-buttonX" onClick={() => setScreen('home')}>
                     Volver
                 </button>
             </React.Fragment>
