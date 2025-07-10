@@ -391,19 +391,21 @@ body, html {
 
 @media (max-width: 768px) {
     .rooms-container {
-        padding: 10px;
+        padding: 5px;
+        
     }
     .rooms-title {
         font-size: 2.2rem;
-        margin-bottom: 20px;
+        margin-bottom: 2px;
     }
     .rooms-list {
         flex-direction: column;
         align-items: center;
-        gap: 20px;
+        gap: 15px;
     }
     .room-card {
-        width: 90%;
+        flex: 0 0 calc(20% - -50px); /* ocupa aproximadamente el 50% menos el gap */
+        box-sizing: border-box;
         padding: 15px;
     }
     .room-name {
