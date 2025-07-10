@@ -404,9 +404,11 @@ body, html {
         gap: 15px;
     }
     .room-card {
-        flex: 0 0 calc(20% - -50px); /* ocupa aproximadamente el 50% menos el gap */
+        flex: 0 0 calc(15% - -50px); /* ocupa aproximadamente el 50% menos el gap */
         box-sizing: border-box;
-        padding: 15px;
+        padding: 10px;
+        width: 250px;
+        
     }
     .room-name {
         font-size: 1.5rem;
@@ -422,7 +424,7 @@ body, html {
         font-size: 1rem;
     }
     .back-button {
-        padding: 10px 25px;
+        padding: 10px 15px;
         font-size: 1rem;
         margin-top: 20px;
     }
@@ -468,5 +470,8 @@ body, html {
     }
     .crowd-animation {
         height: 10%;
+    }
+    .room-button{
+        margin-bottom: 60px;
     }
 }
