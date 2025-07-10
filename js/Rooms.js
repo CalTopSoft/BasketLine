@@ -100,6 +100,25 @@ const Rooms = ({ setScreen, wsRef, roomStatusRef, nameRef }) => { // Agregar nam
                             </button>
                         </div>
                     </div>
+
+                    <div className="room-card" id="room3-card">
+                        <div className="room-header">
+                            <span className="room-name">Cancha 3</span>
+                            <span className="room-status">
+                                ({roomStatusRef.current.room3.players}/2)
+                            </span>
+                        </div>
+                        <div className="room-content">
+                            <p className="room-info">¡Encesta lo mas que puedas!</p>
+                            <button
+                                className={`room-button ${roomStatusRef.current.room3.players >= 2 ? 'disabled' : ''}`}
+                                onClick={() => handleJoinRoom('room3')}
+                                disabled={roomStatusRef.current.room3.players >= 2}
+                            >
+                                Jugar
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <button className="back-button" onClick={() => setScreen('home')}>
