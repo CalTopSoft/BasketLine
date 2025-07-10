@@ -422,11 +422,13 @@ body, html {
     .room-button {
         padding: 10px 20px;
         font-size: 1rem;
+        
     }
     .back-button {
         padding: 10px 15px;
         font-size: 1rem;
         margin-top: 20px;
+        top: -80px !important;
     }
     .basketball-ball {
         width: 40px;
