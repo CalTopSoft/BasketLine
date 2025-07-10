@@ -394,13 +394,11 @@ body, html {
     .rooms-container {
         padding: 5px;
         justify-content: flex-start;
-
-        
     }
     .rooms-title {
         font-size: 1.9rem;
         margin-bottom: 2px;
-        padding-top: 75px;
+        padding-top: 80px;
     }
     .rooms-list {
         flex-direction: column;
@@ -412,7 +410,7 @@ body, html {
         box-sizing: border-box;
         padding: 10px;
         width: 250px;
-        top: -90px;
+        top: -85px;
         
     }
     .room-name {
@@ -438,7 +436,7 @@ body, html {
     .back-buttonX{
         padding: 10px 15px;
         font-size: 1rem;
-        margin-top: -165px;
+        margin-top: -155px;
     }
 
     .basketball-ball {
