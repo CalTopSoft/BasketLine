@@ -94,6 +94,7 @@ const Gameplay = ({
                 p.text("Imágenes no cargadas - modo debug", 10, 20);
             }
 
+            // Dibujar texto animado "¡Encestaste!" solo para el jugador que encesta
             if (scoreAnimation.current.show) {
                 const elapsed = p.millis() - scoreAnimation.current.startTime;
                 if (elapsed < 2000) {
@@ -136,14 +137,6 @@ const Gameplay = ({
                     dragStartX = p.mouseX;
                     dragStartY = p.mouseY;
                 }
-            } else {
-                console.log("No se permite lanzar:", {
-                    gameStarted,
-                    turn: turnRef.current,
-                    playerIndex: playerIndexRef.current,
-                    ballThrown: ballRef.current.thrown,
-                    attempts: attemptsRef.current[playerIndexRef.current]
-                });
             }
         };
 
@@ -203,27 +196,22 @@ const Gameplay = ({
                 if (data.players) playersRef.current = data.players;
                 if (data.playerIndex !== undefined) playerIndexRef.current = data.playerIndex;
 
+                // Reiniciar animación en nueva ronda
                 if (data.type === 'newRound') {
-                    scoreAnimation.current = { show: false, startTime: 0 }; // Reiniciar animación
-                    console.log("Nueva ronda iniciada:", {
-                        round: data.round,
-                        attempts: data.attempts,
-                        turn: data.turn,
-                        playerIndex: playerIndexRef.current
-                    });
+                    scoreAnimation.current = { show: false, startTime: 0 };
                 }
 
-                if (data.type === 'scoreUpdate' && data.turn === playerIndexRef.current) {
-                    scoreAnimation.current = { show: true, startTime: p5Instance.current ? p5Instance.current.millis() : 0 };
-                    console.log("ScoreUpdate recibido:", {
-                        turn: data.turn,
-                        playerIndex: playerIndexRef.current,
-                        scores: data.scores
-                    });
+                // CORREGIDO: Mostrar texto solo para el jugador que encestó
+                if (data.type === 'scoreUpdate' && data.scoringPlayer === playerIndexRef.current) {
+                    scoreAnimation.current = { 
+                        show: true, 
+                        startTime: p5Instance.current ? p5Instance.current.millis() : Date.now() 
+                    };
                 }
 
+                // CORREGIDO: Confeti para ambos jugadores cuando alguien encesta
                 if (data.type === 'confetti' && window.confetti) {
-                    const originX = data.playerIndex === 0 ? 0 : 1;
+                    const originX = data.scoringPlayer === 0 ? 0 : 1;
                     window.confetti({
                         particleCount: 100,
                         spread: 70,
