@@ -20,8 +20,7 @@ const Gameplay = ({
     const sketchRef = useRef(null);
     const p5Instance = useRef(null);
     const isMounted = useRef(false);
-    const updateCounterRef = useRef(0);
-    const scoreAnimation = useRef({ show: false, startTime: 0 }); // Para controlar el texto animado
+    const scoreAnimation = useRef({ show: false, startTime: 0 });
 
     const setupSketch = (p) => {
         let ballImg, hoopBaseImg, hoopRingImg;
@@ -39,8 +38,8 @@ const Gameplay = ({
         p.setup = () => {
             p.createCanvas(600, 490);
             p.frameRate(62);
-            p.textAlign(p.CENTER, p.CENTER); // Centrar el texto
-            p.textStyle(p.BOLD); // Estilo en negrita
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textStyle(p.BOLD);
         };
 
         p.draw = () => {
@@ -95,24 +94,23 @@ const Gameplay = ({
                 p.text("Imágenes no cargadas - modo debug", 10, 20);
             }
 
-            // Dibujar texto animado "¡Encestaste!" solo para el jugador que encestó
             if (scoreAnimation.current.show) {
                 const elapsed = p.millis() - scoreAnimation.current.startTime;
-                if (elapsed < 2000) { // Mostrar durante 2 segundos
-                    const alpha = p.map(elapsed, 0, 2000, 255, 0); // Desvanecimiento
-                    const scale = p.map(elapsed, 0, 1000, 1, 1.2) * p.map(elapsed, 1000, 2000, 1.2, 0.8); // Escala creciente y luego decreciente
-                    const textSize = p.width < 400 ? 24 : 32; // Tamaño responsivo
+                if (elapsed < 2000) {
+                    const alpha = p.map(elapsed, 0, 2000, 255, 0);
+                    const scale = p.map(elapsed, 0, 1000, 1, 1.2) * p.map(elapsed, 1000, 2000, 1.2, 0.8);
+                    const textSize = p.width < 400 ? 24 : 32;
                     p.push();
                     p.textSize(textSize);
-                    p.fill(255, 215, 0, alpha); // Color dorado
-                    p.stroke(0, alpha); // Contorno negro
+                    p.fill(255, 215, 0, alpha);
+                    p.stroke(0, alpha);
                     p.strokeWeight(2);
                     p.translate(p.width / 2, p.height / 2);
-                    p.scale(scale); // Animación de escala
+                    p.scale(scale);
                     p.text("¡Encestaste!", 0, 0);
                     p.pop();
                 } else {
-                    scoreAnimation.current.show = false; // Desactivar después de 2 segundos
+                    scoreAnimation.current.show = false;
                 }
             }
         };
@@ -138,6 +136,14 @@ const Gameplay = ({
                     dragStartX = p.mouseX;
                     dragStartY = p.mouseY;
                 }
+            } else {
+                console.log("No se permite lanzar:", {
+                    gameStarted,
+                    turn: turnRef.current,
+                    playerIndex: playerIndexRef.current,
+                    ballThrown: ballRef.current.thrown,
+                    attempts: attemptsRef.current[playerIndexRef.current]
+                });
             }
         };
 
@@ -197,19 +203,32 @@ const Gameplay = ({
                 if (data.players) playersRef.current = data.players;
                 if (data.playerIndex !== undefined) playerIndexRef.current = data.playerIndex;
 
-                // Activar texto animado solo para el jugador que encestó
-                if (data.type === 'scoreUpdate' && data.turn === playerIndexRef.current) {
-                    scoreAnimation.current = { show: true, startTime: p5Instance.current ? p5Instance.current.millis() : 0 };
+                if (data.type === 'newRound') {
+                    scoreAnimation.current = { show: false, startTime: 0 }; // Reiniciar animación
+                    console.log("Nueva ronda iniciada:", {
+                        round: data.round,
+                        attempts: data.attempts,
+                        turn: data.turn,
+                        playerIndex: playerIndexRef.current
+                    });
                 }
 
-                // Activar confeti para ambos jugadores
+                if (data.type === 'scoreUpdate' && data.turn === playerIndexRef.current) {
+                    scoreAnimation.current = { show: true, startTime: p5Instance.current ? p5Instance.current.millis() : 0 };
+                    console.log("ScoreUpdate recibido:", {
+                        turn: data.turn,
+                        playerIndex: playerIndexRef.current,
+                        scores: data.scores
+                    });
+                }
+
                 if (data.type === 'confetti' && window.confetti) {
-                    const originX = data.playerIndex === 0 ? 0 : 1; // Izquierda (0) o derecha (1)
+                    const originX = data.playerIndex === 0 ? 0 : 1;
                     window.confetti({
                         particleCount: 100,
                         spread: 70,
                         origin: { x: originX, y: 0.6 },
-                        colors: ['#FFD700', '#FF4500', '#00FF00'], // Colores festivos
+                        colors: ['#FFD700', '#FF4500', '#00FF00'],
                     });
                 }
                 
